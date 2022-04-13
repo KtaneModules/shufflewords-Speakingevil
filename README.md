@@ -1,1 +1,1 @@
-# shufflewords
+#[ModKit Wiki](../../wiki)

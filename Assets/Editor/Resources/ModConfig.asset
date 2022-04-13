@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
+  m_Name: ModConfig
+  m_EditorClassIdentifier: 
+  id: shufflewords
+  title: Shufflewords
+  author: Speakingevil
+  description: 'Five passwords. That secure enough for ya?
+
+
+    Shift the rows and columns of the grid so that every row or column has a five
+    letter word.'
+  version: 1.0
+  outputFolder: build
+  previewImage: {fileID: 2800000, guid: 93b503816c27449478127efd74c24d38, type: 3}
