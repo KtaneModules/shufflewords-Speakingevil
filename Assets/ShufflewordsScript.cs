@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class ShufflewordsScript : MonoBehaviour {
@@ -110,12 +111,13 @@ public class ShufflewordsScript : MonoBehaviour {
     };
     private string[] words = new string[5];
     private string[,] grid = new string[5, 5];
-    private static int moduleIDCounter;
+    private static int moduleIdCounter = 1;
     private int moduleID;
     private bool moduleSolved;
 
     private void Awake()
     {
+        moduleID = moduleIdCounter++;
         for(int i = 0; i < 5; i++)
         {
             words[i] = uwordlist[Random.Range(0, 2408)];
@@ -240,6 +242,66 @@ public class ShufflewordsScript : MonoBehaviour {
                         grid[k, i] = grid[k + 1, i];
                     grid[4, i] = temp;
                 }
+            }
+        }
+    }
+
+    //twitch plays
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} row<#> l/r<#₂> [Shifts row '#' left/right '#₂' times] | !{0} col<#> u/d<#₂> [Shifts column '#' up/down '#₂' times] | !{0} submit [Presses submit] | Shift commands are chainable, for ex: !{0} row1 l3 col1 d1";
+    #pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        command = Regex.Replace(command, @"\s+", " ");
+        command = command.ToLower().Trim();
+        if (command.Equals("submit"))
+        {
+            yield return null;
+            submit.OnInteract();
+            yield break;
+        }
+        string[] parameters = command.Split(' ');
+        if (parameters.Length % 2 != 0) yield break;
+        char lastUsed = 'N';
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            if (i % 2 == 0)
+            {
+                if (parameters[i].EqualsAny("row1", "row2", "row3", "row4", "row5"))
+                    lastUsed = 'R';
+                else if (parameters[i].EqualsAny("col1", "col2", "col3", "col4", "col5"))
+                    lastUsed = 'C';
+                else
+                    yield break;
+            }
+            else if (!parameters[i].EqualsAny("l1", "l2", "l3", "l4", "l5", "r1", "r2", "r3", "r4", "r5") && !parameters[i].EqualsAny("u1", "u2", "u3", "u4", "u5", "d1", "d2", "d3", "d4", "d5"))
+                yield break;
+            else if ((parameters[i].EqualsAny("l1", "l2", "l3", "l4", "l5", "r1", "r2", "r3", "r4", "r5") && lastUsed != 'R') || (parameters[i].EqualsAny("u1", "u2", "u3", "u4", "u5", "d1", "d2", "d3", "d4", "d5") && lastUsed != 'C'))
+                yield break;
+        }
+        yield return null;
+        for (int i = 0; i < parameters.Length; i+=2)
+        {
+            int index = 0;
+            int times = int.Parse(parameters[i + 1][1].ToString());
+            if (parameters[i].Contains("row"))
+            {
+                if (parameters[i + 1][0].Equals('l'))
+                    index += 14 + int.Parse(parameters[i][3].ToString());
+                else
+                    index += 5 + int.Parse(parameters[i][3].ToString()) - 1;
+            }
+            else if (parameters[i].Contains("col"))
+            {
+                if (parameters[i + 1][0].Equals('u'))
+                    index += int.Parse(parameters[i][3].ToString()) - 1;
+                else
+                    index += 9 + int.Parse(parameters[i][3].ToString());
+            }
+            for (int j = 0; j < times; j++)
+            {
+                arrows[index].OnInteract();
+                yield return new WaitForSeconds(.1f);
             }
         }
     }
